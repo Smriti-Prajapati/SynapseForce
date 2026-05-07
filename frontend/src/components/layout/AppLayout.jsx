@@ -9,6 +9,7 @@ const pageTitles = {
   '/resumes': 'Resume Management',
   '/team': 'Team Builder',
   '/analytics': 'Analytics',
+  '/messages': 'Messages',
   '/profile': 'My Profile',
 }
 

@@ -12,7 +12,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Redirect to login on 401
+// Redirect to login only on 401 (expired/invalid token)
 api.interceptors.response.use(
   (res) => res,
   (err) => {

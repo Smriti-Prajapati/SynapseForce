@@ -31,9 +31,9 @@ public class DataSeeder implements CommandLineRunner {
         if (userRepository.count() > 0) return;
 
         User admin = userRepository.save(User.builder()
-                .fullName("Alex Morgan")
-                .email("admin@synapseforce.com")
-                .password(passwordEncoder.encode("admin123"))
+                .fullName("Smriti Prajapati")
+                .email("smriti@gmail.com")
+                .password(passwordEncoder.encode("smriti123"))
                 .role(Role.ADMIN)
                 .build());
 
@@ -55,6 +55,8 @@ public class DataSeeder implements CommandLineRunner {
                 .description("Build a scalable e-commerce backend with microservices")
                 .requiredSkills("Java, Spring Boot, Docker, SQL")
                 .status(ProjectStatus.IN_PROGRESS)
+                .progressPercent(65)
+                .progressNote("API layer complete, working on payment integration")
                 .teamMembers(new java.util.ArrayList<>(List.of(alice, dave)))
                 .createdBy(admin)
                 .build());
@@ -64,6 +66,8 @@ public class DataSeeder implements CommandLineRunner {
                 .description("Build a product recommendation system using collaborative filtering")
                 .requiredSkills("Python, Machine Learning, Pandas")
                 .status(ProjectStatus.OPEN)
+                .progressPercent(20)
+                .progressNote("Data pipeline setup in progress")
                 .teamMembers(new java.util.ArrayList<>(List.of(bob, eve)))
                 .createdBy(admin)
                 .build());
@@ -73,11 +77,12 @@ public class DataSeeder implements CommandLineRunner {
                 .description("React-based analytics dashboard for customer insights")
                 .requiredSkills("React, TypeScript, GraphQL")
                 .status(ProjectStatus.OPEN)
+                .progressPercent(0)
                 .teamMembers(new java.util.ArrayList<>(List.of(carol)))
                 .createdBy(admin)
                 .build());
 
-        log.info("✅ Demo data seeded. Login: admin@synapseforce.com / admin123");
+        log.info("✅ Demo data seeded. Login: smriti@gmail.com / smriti123");
     }
 
     private User createUser(String name, String email) {

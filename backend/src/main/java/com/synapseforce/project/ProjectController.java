@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/projects")
@@ -63,5 +64,28 @@ public class ProjectController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         projectService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // HR manually adds a member to the project team
+    @PostMapping("/{id}/members/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProjectResponse> addMember(
+            @PathVariable Long id, @PathVariable Long userId) {
+        return ResponseEntity.ok(projectService.addMember(id, userId));
+    }
+
+    // HR removes a member from the project team
+    @DeleteMapping("/{id}/members/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ProjectResponse> removeMember(
+            @PathVariable Long id, @PathVariable Long userId) {
+        return ResponseEntity.ok(projectService.removeMember(id, userId));
+    }
+
+    // Skill gap analysis for a project
+    @GetMapping("/{id}/skill-gap")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> skillGap(@PathVariable Long id) {
+        return ResponseEntity.ok(projectService.analyzeSkillGap(id));
     }
 }

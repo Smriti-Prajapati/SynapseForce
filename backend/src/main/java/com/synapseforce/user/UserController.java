@@ -1,6 +1,5 @@
 package com.synapseforce.user;
 
-import com.synapseforce.skill.Skill;
 import com.synapseforce.skill.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,27 +19,28 @@ public class UserController {
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
 
-    // HR: list all employees
+    // HR: list all employees with skill summary
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Map<String, Object>>> listAll() {
         List<Map<String, Object>> users = userRepository.findAll().stream()
                 .map(u -> {
-                    List<Skill> skills = skillRepository.findByUserId(u.getId());
+                    var skills = skillRepository.findByUserId(u.getId());
                     return Map.<String, Object>of(
                         "id", u.getId(),
                         "fullName", u.getFullName(),
                         "email", u.getEmail(),
                         "role", u.getRole(),
                         "skillCount", skills.size(),
-                        "topSkills", skills.stream().limit(4).map(Skill::getSkillName).toList()
+                        "topSkills", skills.stream().limit(4)
+                            .map(s -> s.getSkillName()).toList()
                     );
                 })
                 .toList();
         return ResponseEntity.ok(users);
     }
 
-    // Get any user's profile (admin) or own profile (user)
+    // Get any user's profile — admin sees anyone, user sees only themselves
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getProfile(
             @PathVariable Long id,
@@ -49,14 +49,19 @@ public class UserController {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // Users can only view their own profile; admins can view anyone
         User requester = userRepository.findByEmail(principal.getUsername()).orElseThrow();
-        if (requester.getRole() != com.synapseforce.user.Role.ADMIN
-                && !requester.getId().equals(id)) {
+        if (requester.getRole() != Role.ADMIN && !requester.getId().equals(id)) {
             return ResponseEntity.status(403).build();
         }
 
-        List<Skill> skills = skillRepository.findByUserId(id);
+        var skills = skillRepository.findByUserId(id).stream()
+                .map(s -> Map.<String, Object>of(
+                    "id", s.getId(),
+                    "skillName", s.getSkillName(),
+                    "strengthLevel", s.getStrengthLevel()
+                ))
+                .toList();
+
         return ResponseEntity.ok(Map.of(
             "id", user.getId(),
             "fullName", user.getFullName(),
@@ -66,11 +71,19 @@ public class UserController {
         ));
     }
 
-    // Logged-in user's own profile shortcut
+    // Logged-in user's own profile
     @GetMapping("/me")
     public ResponseEntity<Map<String, Object>> getMe(@AuthenticationPrincipal UserDetails principal) {
         User user = userRepository.findByEmail(principal.getUsername()).orElseThrow();
-        List<Skill> skills = skillRepository.findByUserId(user.getId());
+
+        var skills = skillRepository.findByUserId(user.getId()).stream()
+                .map(s -> Map.<String, Object>of(
+                    "id", s.getId(),
+                    "skillName", s.getSkillName(),
+                    "strengthLevel", s.getStrengthLevel()
+                ))
+                .toList();
+
         return ResponseEntity.ok(Map.of(
             "id", user.getId(),
             "fullName", user.getFullName(),
@@ -80,8 +93,16 @@ public class UserController {
         ));
     }
 
+    // Skills for a specific user
     @GetMapping("/{id}/skills")
-    public ResponseEntity<List<Skill>> getUserSkills(@PathVariable Long id) {
-        return ResponseEntity.ok(skillRepository.findByUserId(id));
+    public ResponseEntity<List<Map<String, Object>>> getUserSkills(@PathVariable Long id) {
+        var result = skillRepository.findByUserId(id).stream()
+                .map(s -> Map.<String, Object>of(
+                    "id", s.getId(),
+                    "skillName", s.getSkillName(),
+                    "strengthLevel", s.getStrengthLevel()
+                ))
+                .toList();
+        return ResponseEntity.ok(result);
     }
 }

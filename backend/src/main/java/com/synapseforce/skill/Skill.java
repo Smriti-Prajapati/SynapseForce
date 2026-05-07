@@ -1,5 +1,6 @@
 package com.synapseforce.skill;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.synapseforce.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,6 +24,7 @@ public class Skill {
     @Column(nullable = false)
     private int strengthLevel;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

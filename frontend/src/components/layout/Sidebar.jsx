@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, FileText, Users, BarChart2, Zap, Briefcase, UserCircle, Search } from 'lucide-react'
+import { LayoutDashboard, FileText, Users, BarChart2, Zap, Briefcase, UserCircle, Search, MessageSquare } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import clsx from 'clsx'
 
@@ -9,12 +9,14 @@ const adminNav = [
   { to: '/projects', label: 'Projects', icon: Briefcase },
   { to: '/resumes', label: 'Resumes', icon: FileText },
   { to: '/team', label: 'Team Builder', icon: Search },
+  { to: '/messages', label: 'Messages', icon: MessageSquare },
   { to: '/analytics', label: 'Analytics', icon: BarChart2 },
 ]
 
 const userNav = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/profile', label: 'My Profile', icon: UserCircle },
+  { to: '/messages', label: 'Message HR', icon: MessageSquare },
 ]
 
 export default function Sidebar() {

@@ -11,6 +11,8 @@ import Projects from './pages/Projects'
 import Employees from './pages/Employees'
 import MyProfile from './pages/MyProfile'
 
+import Messages from './pages/Messages'
+
 function ProtectedRoute({ children, adminOnly = false }) {
   const { user } = useAuth()
   if (!user) return <Navigate to="/login" replace />
@@ -47,6 +49,7 @@ export default function App() {
           <Route path="resumes" element={<ProtectedRoute adminOnly><ResumeUpload /></ProtectedRoute>} />
           <Route path="team" element={<ProtectedRoute adminOnly><TeamSuggestions /></ProtectedRoute>} />
           <Route path="analytics" element={<ProtectedRoute adminOnly><Analytics /></ProtectedRoute>} />
+          <Route path="messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

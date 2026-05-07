@@ -5,27 +5,28 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('sf_user')
-    return stored ? JSON.parse(stored) : null
+    try {
+      const stored = localStorage.getItem('sf_user')
+      return stored ? JSON.parse(stored) : null
+    } catch {
+      return null
+    }
   })
   const [ready, setReady] = useState(false)
 
-  // On mount, verify the stored token is still valid
-  // If backend restarted (H2 reset), token will 401 and we clear it
   useEffect(() => {
     const token = localStorage.getItem('sf_token')
     if (!token) {
       setReady(true)
       return
     }
+    // Verify token is still valid (backend may have restarted)
     api.get('/users/me')
-      .then(res => {
-        // Token still valid — refresh user data
-        const stored = localStorage.getItem('sf_user')
-        if (stored) setUser(JSON.parse(stored))
+      .then(() => {
+        // Token valid — keep existing user state
       })
       .catch(() => {
-        // Token invalid or expired — clear everything
+        // Token expired/invalid — clear and force re-login
         localStorage.removeItem('sf_token')
         localStorage.removeItem('sf_user')
         setUser(null)
@@ -55,7 +56,6 @@ export function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
-  // Don't render until we've verified the token
   if (!ready) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">

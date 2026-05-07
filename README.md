@@ -21,7 +21,7 @@ npm run dev
 ## Demo Credentials
 | Role  | Email                        | Password  |
 |-------|------------------------------|-----------|
-| Admin | admin@synapseforce.com       | admin123  |
+| Admin | smriti@gmail.com             | smriti123 |
 | User  | alice@synapseforce.com       | pass123   |
 
 ## API Endpoints

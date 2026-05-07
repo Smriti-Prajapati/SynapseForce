@@ -1,5 +1,6 @@
 package com.synapseforce.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.synapseforce.skill.Skill;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,6 +29,7 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 
@@ -35,17 +37,19 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Skill> skills;
 
+    @JsonIgnore
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
-    @Override public String getUsername() { return email; }
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+    @JsonIgnore @Override public String getUsername() { return email; }
+    @JsonIgnore @Override public boolean isAccountNonExpired() { return true; }
+    @JsonIgnore @Override public boolean isAccountNonLocked() { return true; }
+    @JsonIgnore @Override public boolean isCredentialsNonExpired() { return true; }
+    @JsonIgnore @Override public boolean isEnabled() { return true; }
 }

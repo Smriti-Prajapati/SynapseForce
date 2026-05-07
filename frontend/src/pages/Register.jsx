@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Zap } from 'lucide-react'
+import { useTheme } from '../context/ThemeContext'
+import { Zap, Sun, Moon } from 'lucide-react'
 
 export default function Register() {
   const { register } = useAuth()
+  const { dark, toggle } = useTheme()
   const navigate = useNavigate()
   const [form, setForm] = useState({ fullName: '', email: '', password: '', role: 'USER' })
   const [error, setError] = useState('')
@@ -18,35 +20,48 @@ export default function Register() {
       await register(form.fullName, form.email, form.password, form.role)
       navigate('/')
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed')
+      // Show the real server error, not a generic message
+      const msg = err.response?.data?.message
+        || err.response?.data
+        || err.message
+        || 'Registration failed. Please try again.'
+      setError(typeof msg === 'string' ? msg : 'Registration failed. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4 transition-colors">
+      {/* Theme toggle */}
+      <button
+        onClick={toggle}
+        className="fixed top-4 right-4 p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+      >
+        {dark ? <Sun size={16} /> : <Moon size={16} />}
+      </button>
+
       <div className="w-full max-w-sm">
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center">
             <Zap size={18} className="text-white" />
           </div>
-          <span className="text-xl font-semibold text-gray-900">SynapseForce</span>
+          <span className="text-xl font-semibold text-gray-900 dark:text-gray-100">SynapseForce</span>
         </div>
 
         <div className="card">
-          <h2 className="text-lg font-semibold text-gray-900 mb-1">Create account</h2>
-          <p className="text-sm text-gray-500 mb-6">Get started with SynapseForce</p>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">Create account</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Get started with SynapseForce</p>
 
           {error && (
-            <div className="mb-4 px-3 py-2 bg-red-50 border border-red-100 rounded-lg text-sm text-red-600">
+            <div className="mb-4 px-3 py-2 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Full name</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Full name</label>
               <input
                 type="text"
                 className="input"
@@ -57,7 +72,7 @@ export default function Register() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
               <input
                 type="email"
                 className="input"
@@ -68,7 +83,7 @@ export default function Register() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Password</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
               <input
                 type="password"
                 className="input"
@@ -76,10 +91,11 @@ export default function Register() {
                 value={form.password}
                 onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 required
+                minLength={6}
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Role</label>
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
               <select
                 className="input"
                 value={form.role}
@@ -95,9 +111,9 @@ export default function Register() {
           </form>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
           Already have an account?{' '}
-          <Link to="/login" className="text-brand-600 font-medium hover:underline">
+          <Link to="/login" className="text-brand-600 dark:text-brand-400 font-medium hover:underline">
             Sign in
           </Link>
         </p>
