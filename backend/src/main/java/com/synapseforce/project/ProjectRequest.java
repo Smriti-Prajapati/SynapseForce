@@ -2,6 +2,7 @@ package com.synapseforce.project;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import java.time.LocalDate;
 
 @Data
 public class ProjectRequest {
@@ -11,5 +12,7 @@ public class ProjectRequest {
     private String description;
 
     @NotBlank
-    private String requiredSkills; // comma-separated
+    private String requiredSkills;
+
+    private LocalDate deadline;
 }

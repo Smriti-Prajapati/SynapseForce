@@ -1,5 +1,7 @@
 package com.synapseforce.project;
 
+import com.synapseforce.activity.ActivityLog;
+import com.synapseforce.activity.ActivityLogRepository;
 import com.synapseforce.notification.NotificationRepository;
 import com.synapseforce.team.TeamSuggestionService;
 import com.synapseforce.team.ScoredUser;
@@ -22,6 +24,7 @@ public class ProjectService {
     private final UserRepository userRepository;
     private final TeamSuggestionService suggestionService;
     private final NotificationRepository notificationRepository;
+    private final ActivityLogRepository activityLogRepository;
     private final ApplicationContext applicationContext;
 
     public ProjectResponse create(ProjectRequest request, String creatorEmail) {
@@ -44,6 +47,7 @@ public class ProjectService {
                 .description(request.getDescription())
                 .requiredSkills(request.getRequiredSkills())
                 .status(ProjectStatus.OPEN)
+                .deadline(request.getDeadline())
                 .teamMembers(teamMembers)
                 .createdBy(creator)
                 .build();
@@ -119,6 +123,14 @@ public class ProjectService {
         } else if (req.getProgressPercent() > 0 && project.getStatus() == ProjectStatus.OPEN) {
             project.setStatus(ProjectStatus.IN_PROGRESS);
         }
+
+        // Log activity
+        activityLogRepository.save(ActivityLog.builder()
+                .actorName(user.getFullName())
+                .action(user.getFullName() + " updated \"" + project.getName()
+                        + "\" progress to " + req.getProgressPercent() + "%")
+                .category("PROJECT")
+                .build());
 
         return ProjectResponse.from(projectRepository.save(project));
     }

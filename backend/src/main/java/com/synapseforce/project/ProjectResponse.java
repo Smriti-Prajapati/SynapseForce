@@ -17,6 +17,8 @@ public class ProjectResponse {
     private int progressPercent;
     private String progressNote;
     private LocalDateTime progressUpdatedAt;
+    private java.time.LocalDate deadline;
+    private boolean overdue;
     private LocalDateTime createdAt;
     private String createdBy;
     private List<TeamMemberDto> teamMembers;
@@ -39,6 +41,10 @@ public class ProjectResponse {
                 .progressPercent(p.getProgressPercent())
                 .progressNote(p.getProgressNote())
                 .progressUpdatedAt(p.getProgressUpdatedAt())
+                .deadline(p.getDeadline())
+                .overdue(p.getDeadline() != null
+                    && p.getDeadline().isBefore(java.time.LocalDate.now())
+                    && p.getStatus() != ProjectStatus.COMPLETED)
                 .createdAt(p.getCreatedAt())
                 .createdBy(p.getCreatedBy() != null ? p.getCreatedBy().getFullName() : null)
                 .teamMembers(p.getTeamMembers() == null ? List.of() :

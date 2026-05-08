@@ -1,5 +1,6 @@
 package com.synapseforce.analytics;
 
+import com.synapseforce.activity.ActivityLogRepository;
 import com.synapseforce.project.ProjectRepository;
 import com.synapseforce.project.ProjectStatus;
 import com.synapseforce.skill.SkillRepository;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @RestController
@@ -21,6 +23,7 @@ public class AnalyticsController {
     private final SkillRepository skillRepository;
     private final ResumeRepository resumeRepository;
     private final ProjectRepository projectRepository;
+    private final ActivityLogRepository activityLogRepository;
 
     @GetMapping("/overview")
     @PreAuthorize("hasRole('ADMIN')")
@@ -31,6 +34,10 @@ public class AnalyticsController {
         long totalProjects = projectRepository.count();
         long activeProjects = projectRepository.findAll().stream()
                 .filter(p -> p.getStatus() == ProjectStatus.IN_PROGRESS).count();
+        long overdueProjects = projectRepository.findAll().stream()
+                .filter(p -> p.getDeadline() != null
+                        && p.getDeadline().isBefore(LocalDate.now())
+                        && p.getStatus() != ProjectStatus.COMPLETED).count();
 
         List<Object[]> rawDistribution = skillRepository.findSkillDistribution();
         List<Map<String, Object>> skillDistribution = rawDistribution.stream()
@@ -41,16 +48,42 @@ public class AnalyticsController {
         String topSkill = skillDistribution.isEmpty() ? "N/A"
                 : (String) skillDistribution.get(0).get("skill");
 
+        // Skill gap: skills needed by open projects vs skills available in team
+        List<String> neededSkills = projectRepository.findAll().stream()
+                .filter(p -> p.getStatus() != ProjectStatus.COMPLETED)
+                .flatMap(p -> Arrays.stream(p.getRequiredSkills().split(",")))
+                .map(String::trim).map(String::toLowerCase).distinct().toList();
+
+        List<String> availableSkills = skillRepository.findAll().stream()
+                .map(s -> s.getSkillName().toLowerCase()).distinct().toList();
+
+        List<String> missingSkills = neededSkills.stream()
+                .filter(n -> availableSkills.stream().noneMatch(a -> a.contains(n) || n.contains(a)))
+                .toList();
+
+        // Recent activity
+        List<Map<String, Object>> recentActivity = activityLogRepository
+                .findTop20ByOrderByOccurredAtDesc().stream()
+                .map(a -> Map.<String, Object>of(
+                    "id", a.getId(),
+                    "actorName", a.getActorName(),
+                    "action", a.getAction(),
+                    "category", a.getCategory(),
+                    "occurredAt", a.getOccurredAt().toString()
+                )).toList();
+
         return ResponseEntity.ok(Map.of(
             "totalEmployees", totalEmployees,
             "totalSkills", totalSkills,
             "totalResumes", totalResumes,
             "totalProjects", totalProjects,
             "activeProjects", activeProjects,
+            "overdueProjects", overdueProjects,
             "skillDistribution", skillDistribution,
-            "insight", topSkill.equals("N/A")
-                ? "No skills detected yet"
-                : topSkill + " is the most common skill across your team"
+            "missingSkills", missingSkills,
+            "recentActivity", recentActivity,
+            "insight", topSkill.equals("N/A") ? "No skills detected yet"
+                    : topSkill + " is the most common skill across your team"
         ));
     }
 }

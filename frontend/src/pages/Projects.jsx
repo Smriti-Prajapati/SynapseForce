@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Plus, Briefcase, Trash2, CheckCircle, Clock, Circle, TrendingUp, Pencil } from 'lucide-react'
+import { Plus, Briefcase, Trash2, CheckCircle, Clock, Circle, TrendingUp, Pencil, AlertTriangle, Calendar } from 'lucide-react'
 import api from '../lib/api'
 import EmptyState from '../components/ui/EmptyState'
 
@@ -10,7 +10,7 @@ const STATUS_CONFIG = {
 }
 
 function CreateProjectModal({ onClose, onCreated }) {
-  const [form, setForm] = useState({ name: '', description: '', requiredSkills: '' })
+  const [form, setForm] = useState({ name: '', description: '', requiredSkills: '', deadline: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -52,6 +52,12 @@ function CreateProjectModal({ onClose, onCreated }) {
             <input className="input" placeholder="e.g. Java, Spring Boot, Docker, SQL"
               value={form.requiredSkills} onChange={e => setForm(f => ({ ...f, requiredSkills: e.target.value }))} required />
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Comma-separated. Team will be auto-matched.</p>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Deadline (optional)</label>
+            <input type="date" className="input"
+              value={form.deadline || ''}
+              onChange={e => setForm(f => ({ ...f, deadline: e.target.value }))} />
           </div>
           {error && (
             <div className="px-3 py-2 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
@@ -184,6 +190,18 @@ function ProjectCard({ project, onStatusChange, onDelete, onProjectUpdate }) {
             </span>
           ))}
         </div>
+
+        {/* Deadline */}
+        {project.deadline && (
+          <div className={`flex items-center gap-1.5 text-xs ${
+            project.overdue
+              ? 'text-red-500 dark:text-red-400'
+              : 'text-gray-500 dark:text-gray-400'
+          }`}>
+            {project.overdue ? <AlertTriangle size={11} /> : <Calendar size={11} />}
+            <span>{project.overdue ? 'Overdue · ' : 'Due '}{new Date(project.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+          </div>
+        )}
 
         {/* Progress */}
         <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3">

@@ -19,28 +19,29 @@ public class UserController {
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
 
-    // HR: list all employees with skill summary
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Map<String, Object>>> listAll() {
         List<Map<String, Object>> users = userRepository.findAll().stream()
                 .map(u -> {
                     var skills = skillRepository.findByUserId(u.getId());
+                    double avg = skills.isEmpty() ? 0 :
+                            skills.stream().mapToInt(s -> s.getStrengthLevel()).average().orElse(0);
                     return Map.<String, Object>of(
                         "id", u.getId(),
                         "fullName", u.getFullName(),
                         "email", u.getEmail(),
                         "role", u.getRole(),
+                        "availability", u.getAvailability() != null ? u.getAvailability() : AvailabilityStatus.AVAILABLE,
                         "skillCount", skills.size(),
-                        "topSkills", skills.stream().limit(4)
-                            .map(s -> s.getSkillName()).toList()
+                        "topSkills", skills.stream().limit(4).map(s -> s.getSkillName()).toList(),
+                        "performanceScore", (int) Math.round(avg * 10)
                     );
                 })
                 .toList();
         return ResponseEntity.ok(users);
     }
 
-    // Get any user's profile — admin sees anyone, user sees only themselves
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getProfile(
             @PathVariable Long id,
@@ -48,61 +49,70 @@ public class UserController {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
         User requester = userRepository.findByEmail(principal.getUsername()).orElseThrow();
         if (requester.getRole() != Role.ADMIN && !requester.getId().equals(id)) {
             return ResponseEntity.status(403).build();
         }
-
         var skills = skillRepository.findByUserId(id).stream()
-                .map(s -> Map.<String, Object>of(
-                    "id", s.getId(),
-                    "skillName", s.getSkillName(),
-                    "strengthLevel", s.getStrengthLevel()
-                ))
+                .map(s -> Map.<String, Object>of("id", s.getId(),
+                        "skillName", s.getSkillName(), "strengthLevel", s.getStrengthLevel()))
                 .toList();
+        double avg = skills.isEmpty() ? 0 :
+                skills.stream().mapToDouble(s -> (int) s.get("strengthLevel")).average().orElse(0);
 
         return ResponseEntity.ok(Map.of(
             "id", user.getId(),
             "fullName", user.getFullName(),
             "email", user.getEmail(),
             "role", user.getRole(),
-            "skills", skills
+            "availability", user.getAvailability() != null ? user.getAvailability() : AvailabilityStatus.AVAILABLE,
+            "skills", skills,
+            "performanceScore", (int) Math.round(avg * 10)
         ));
     }
 
-    // Logged-in user's own profile
     @GetMapping("/me")
     public ResponseEntity<Map<String, Object>> getMe(@AuthenticationPrincipal UserDetails principal) {
         User user = userRepository.findByEmail(principal.getUsername()).orElseThrow();
-
         var skills = skillRepository.findByUserId(user.getId()).stream()
-                .map(s -> Map.<String, Object>of(
-                    "id", s.getId(),
-                    "skillName", s.getSkillName(),
-                    "strengthLevel", s.getStrengthLevel()
-                ))
+                .map(s -> Map.<String, Object>of("id", s.getId(),
+                        "skillName", s.getSkillName(), "strengthLevel", s.getStrengthLevel()))
                 .toList();
+        double avg = skills.isEmpty() ? 0 :
+                skills.stream().mapToDouble(s -> (int) s.get("strengthLevel")).average().orElse(0);
 
         return ResponseEntity.ok(Map.of(
             "id", user.getId(),
             "fullName", user.getFullName(),
             "email", user.getEmail(),
             "role", user.getRole(),
-            "skills", skills
+            "availability", user.getAvailability() != null ? user.getAvailability() : AvailabilityStatus.AVAILABLE,
+            "skills", skills,
+            "performanceScore", (int) Math.round(avg * 10)
         ));
     }
 
-    // Skills for a specific user
     @GetMapping("/{id}/skills")
     public ResponseEntity<List<Map<String, Object>>> getUserSkills(@PathVariable Long id) {
-        var result = skillRepository.findByUserId(id).stream()
-                .map(s -> Map.<String, Object>of(
-                    "id", s.getId(),
-                    "skillName", s.getSkillName(),
-                    "strengthLevel", s.getStrengthLevel()
-                ))
-                .toList();
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(skillRepository.findByUserId(id).stream()
+                .map(s -> Map.<String, Object>of("id", s.getId(),
+                        "skillName", s.getSkillName(), "strengthLevel", s.getStrengthLevel()))
+                .toList());
+    }
+
+    @PatchMapping("/{id}/availability")
+    public ResponseEntity<Map<String, Object>> updateAvailability(
+            @PathVariable Long id,
+            @RequestParam AvailabilityStatus status,
+            @AuthenticationPrincipal UserDetails principal) {
+
+        User requester = userRepository.findByEmail(principal.getUsername()).orElseThrow();
+        if (!requester.getId().equals(id) && requester.getRole() != Role.ADMIN) {
+            return ResponseEntity.status(403).build();
+        }
+        User user = userRepository.findById(id).orElseThrow();
+        user.setAvailability(status);
+        userRepository.save(user);
+        return ResponseEntity.ok(Map.of("availability", status));
     }
 }

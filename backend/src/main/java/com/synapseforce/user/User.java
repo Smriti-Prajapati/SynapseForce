@@ -37,6 +37,11 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    // Availability status
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private AvailabilityStatus availability = AvailabilityStatus.AVAILABLE;
+
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Skill> skills;

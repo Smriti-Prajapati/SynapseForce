@@ -163,9 +163,22 @@ export default function MyProfile() {
         <div className="flex-1">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{profile?.fullName}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">{profile?.email}</p>
-          <span className="badge bg-brand-50 dark:bg-brand-600/10 text-brand-600 dark:text-brand-400 mt-1">
-            {profile?.role}
-          </span>
+          <div className="flex items-center gap-2 mt-1 flex-wrap">
+            <span className="badge bg-brand-50 dark:bg-brand-600/10 text-brand-600 dark:text-brand-400">{profile?.role}</span>
+            {/* Availability selector */}
+            <select
+              className="text-xs border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-brand-500"
+              value={profile?.availability ?? 'AVAILABLE'}
+              onChange={async (e) => {
+                await api.patch(`/users/${user.userId}/availability?status=${e.target.value}`)
+                setProfile(p => ({ ...p, availability: e.target.value }))
+              }}
+            >
+              <option value="AVAILABLE">🟢 Available</option>
+              <option value="BUSY">🟡 Busy</option>
+              <option value="ON_LEAVE">🔴 On Leave</option>
+            </select>
+          </div>
         </div>
         {topSkill?.skillName && (
           <div className="text-right shrink-0">

@@ -4,6 +4,7 @@ import com.synapseforce.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -32,15 +33,16 @@ public class Project {
     @Builder.Default
     private ProjectStatus status = ProjectStatus.OPEN;
 
-    // 0–100 progress percentage updated by employees
     @Builder.Default
     private int progressPercent = 0;
 
-    // Latest progress note from the team
     @Column(columnDefinition = "TEXT")
     private String progressNote;
 
     private LocalDateTime progressUpdatedAt;
+
+    // Deadline for the project
+    private LocalDate deadline;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
