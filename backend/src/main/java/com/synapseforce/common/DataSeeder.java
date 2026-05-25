@@ -2,6 +2,8 @@ package com.synapseforce.common;
 
 import com.synapseforce.activity.ActivityLog;
 import com.synapseforce.activity.ActivityLogRepository;
+import com.synapseforce.notification.Notification;
+import com.synapseforce.notification.NotificationRepository;
 import com.synapseforce.project.Project;
 import com.synapseforce.project.ProjectRepository;
 import com.synapseforce.project.ProjectStatus;
@@ -29,6 +31,7 @@ public class DataSeeder implements CommandLineRunner {
     private final SkillRepository skillRepository;
     private final ProjectRepository projectRepository;
     private final ActivityLogRepository activityLogRepository;
+    private final NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -103,6 +106,37 @@ public class DataSeeder implements CommandLineRunner {
         activityLogRepository.save(ActivityLog.builder().actorName("Bob Patel")
                 .action("Updated \"ML Recommendation Engine\" progress to 20%")
                 .category("PROJECT").build());
+
+        // Seed notifications for employees
+        notificationRepository.save(Notification.builder()
+                .userId(alice.getId())
+                .message("You have been assigned to project: E-Commerce Platform")
+                .read(false).build());
+        notificationRepository.save(Notification.builder()
+                .userId(dave.getId())
+                .message("You have been assigned to project: E-Commerce Platform")
+                .read(false).build());
+        notificationRepository.save(Notification.builder()
+                .userId(bob.getId())
+                .message("You have been assigned to project: ML Recommendation Engine")
+                .read(false).build());
+        notificationRepository.save(Notification.builder()
+                .userId(eve.getId())
+                .message("You have been assigned to project: ML Recommendation Engine")
+                .read(false).build());
+        notificationRepository.save(Notification.builder()
+                .userId(carol.getId())
+                .message("You have been assigned to project: Customer Dashboard")
+                .read(false).build());
+        // Admin notification
+        notificationRepository.save(Notification.builder()
+                .userId(admin.getId())
+                .message("3 projects created and teams auto-assigned based on skill matching")
+                .read(false).build());
+        notificationRepository.save(Notification.builder()
+                .userId(admin.getId())
+                .message("Alice Chen uploaded her resume — skills extracted successfully")
+                .read(false).build());
 
         log.info("✅ Demo data seeded. Login: smriti@gmail.com / smriti123");
     }
