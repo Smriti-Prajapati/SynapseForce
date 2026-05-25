@@ -55,7 +55,8 @@ public class UserController {
         }
         var skills = skillRepository.findByUserId(id).stream()
                 .map(s -> Map.<String, Object>of("id", s.getId(),
-                        "skillName", s.getSkillName(), "strengthLevel", s.getStrengthLevel()))
+                        "skillName", s.getSkillName(), "strengthLevel", s.getStrengthLevel(),
+                        "endorsed", s.isEndorsed()))
                 .toList();
         double avg = skills.isEmpty() ? 0 :
                 skills.stream().mapToDouble(s -> (int) s.get("strengthLevel")).average().orElse(0);
@@ -76,7 +77,8 @@ public class UserController {
         User user = userRepository.findByEmail(principal.getUsername()).orElseThrow();
         var skills = skillRepository.findByUserId(user.getId()).stream()
                 .map(s -> Map.<String, Object>of("id", s.getId(),
-                        "skillName", s.getSkillName(), "strengthLevel", s.getStrengthLevel()))
+                        "skillName", s.getSkillName(), "strengthLevel", s.getStrengthLevel(),
+                        "endorsed", s.isEndorsed()))
                 .toList();
         double avg = skills.isEmpty() ? 0 :
                 skills.stream().mapToDouble(s -> (int) s.get("strengthLevel")).average().orElse(0);
@@ -96,8 +98,25 @@ public class UserController {
     public ResponseEntity<List<Map<String, Object>>> getUserSkills(@PathVariable Long id) {
         return ResponseEntity.ok(skillRepository.findByUserId(id).stream()
                 .map(s -> Map.<String, Object>of("id", s.getId(),
-                        "skillName", s.getSkillName(), "strengthLevel", s.getStrengthLevel()))
+                        "skillName", s.getSkillName(),
+                        "strengthLevel", s.getStrengthLevel(),
+                        "endorsed", s.isEndorsed()))
                 .toList());
+    }
+
+    // HR endorses a skill
+    @PatchMapping("/skills/{skillId}/endorse")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, Object>> endorseSkill(@PathVariable Long skillId) {
+        var skill = skillRepository.findById(skillId)
+                .orElseThrow(() -> new IllegalArgumentException("Skill not found"));
+        skill.setEndorsed(!skill.isEndorsed()); // toggle
+        skillRepository.save(skill);
+        return ResponseEntity.ok(Map.of(
+            "id", skill.getId(),
+            "skillName", skill.getSkillName(),
+            "endorsed", skill.isEndorsed()
+        ));
     }
 
     @PatchMapping("/{id}/availability")

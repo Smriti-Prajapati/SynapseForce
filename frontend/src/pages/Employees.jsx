@@ -108,6 +108,22 @@ function EmployeeRow({ employee, projectCounts }) {
                             style={{ width: `${s.strengthLevel * 10}%` }} />
                         </div>
                         <span className="text-[10px] text-gray-400 w-8 text-right">{s.strengthLevel}/10</span>
+                        {/* Endorse button */}
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            const { data } = await api.patch(`/users/skills/${s.id}/endorse`)
+                            setSkills(prev => prev.map(sk => sk.id === s.id ? { ...sk, endorsed: data.endorsed } : sk))
+                          }}
+                          title={s.endorsed ? 'Remove endorsement' : 'Endorse this skill'}
+                          className={`text-[10px] px-1.5 py-0.5 rounded font-medium transition-colors ${
+                            s.endorsed
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'
+                              : 'bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-green-50 hover:text-green-500'
+                          }`}
+                        >
+                          {s.endorsed ? '✓ Endorsed' : '✓ Endorse'}
+                        </button>
                       </div>
                     ))}
                   </div>

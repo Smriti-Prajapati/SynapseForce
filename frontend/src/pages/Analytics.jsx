@@ -1,8 +1,18 @@
 import { useEffect, useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from 'recharts'
-import { Brain, Users, FileText, TrendingUp, Clock, AlertTriangle, Activity, Zap } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { Brain, Users, FileText, TrendingUp, Clock, AlertTriangle, Activity, Zap, Download } from 'lucide-react'
 import api from '../lib/api'
 import StatCard from '../components/ui/StatCard'
+
+function downloadCSV(url, filename) {
+  api.get(url, { responseType: 'blob' }).then(res => {
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(res.data)
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(link.href)
+  }).catch(console.error)
+}
 
 const COLORS = ['#6366f1','#818cf8','#a5b4fc','#4f46e5','#7c3aed','#8b5cf6','#3b82f6','#60a5fa','#34d399','#f59e0b']
 
@@ -54,6 +64,18 @@ export default function Analytics() {
         <StatCard label="Skills Detected" value={data?.totalSkills ?? 0} icon={Brain} color="purple" />
         <StatCard label="Overdue Projects" value={data?.overdueProjects ?? 0} icon={AlertTriangle} color="green"
           trend={data?.overdueProjects > 0 ? 'Needs attention' : 'All on track'} />
+      </div>
+
+      {/* Export buttons */}
+      <div className="flex gap-3">
+        <button onClick={() => downloadCSV('/export/employees.csv', 'employees.csv')}
+          className="btn-secondary flex items-center gap-2 text-xs">
+          <Download size={13} /> Export Employees CSV
+        </button>
+        <button onClick={() => downloadCSV('/export/projects.csv', 'projects.csv')}
+          className="btn-secondary flex items-center gap-2 text-xs">
+          <Download size={13} /> Export Projects CSV
+        </button>
       </div>
 
       {/* Insight */}

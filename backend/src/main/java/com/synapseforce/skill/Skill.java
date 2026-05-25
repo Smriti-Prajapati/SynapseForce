@@ -20,9 +20,12 @@ public class Skill {
     @Column(nullable = false)
     private String skillName;
 
-    // Strength from 1–10, derived from resume keyword frequency
     @Column(nullable = false)
     private int strengthLevel;
+
+    // HR can endorse/verify a skill — adds a ✓ badge on the frontend
+    @Builder.Default
+    private boolean endorsed = false;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
