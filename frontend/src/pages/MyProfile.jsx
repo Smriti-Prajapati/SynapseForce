@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { Briefcase, Star, Upload, FileText, CheckCircle, TrendingUp, Brain, Shield } from 'lucide-react'
+import { Briefcase, Star, Upload, FileText, CheckCircle, Brain } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import api from '../lib/api'
 import EmptyState from '../components/ui/EmptyState'
@@ -185,8 +185,8 @@ export default function MyProfile() {
             </div>
             <div className="w-px h-10 bg-gray-100 dark:bg-gray-800" />
             <div className="text-center">
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">{profile?.performanceScore ?? 0}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Score</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">{resumes.length}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Resumes</p>
             </div>
             {topSkill?.skillName && (
               <>
@@ -210,8 +210,7 @@ export default function MyProfile() {
         {/* LEFT COLUMN */}
         <div className="space-y-6">
 
-          {/* Skills */}
-          <div className="card">
+          {/* Skills */}          <div className="card">
             <div className="flex items-center gap-2 mb-4">
               <Brain size={15} className="text-brand-500" />
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
@@ -249,6 +248,11 @@ export default function MyProfile() {
               </p>
             )}
           </div>
+
+        </div>
+
+        {/* RIGHT COLUMN */}
+        <div className="space-y-6">
 
           {/* Resume upload */}
           <div className="card">
@@ -292,32 +296,6 @@ export default function MyProfile() {
                 ))}
               </div>
             )}
-          </div>
-
-        </div>
-
-        {/* RIGHT COLUMN */}
-        <div className="space-y-6">
-
-          {/* Performance score card */}
-          <div className="card bg-gradient-to-br from-brand-50 to-indigo-50 dark:from-brand-900/20 dark:to-indigo-900/20 border-brand-100 dark:border-brand-800">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp size={15} className="text-brand-500" />
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">Performance Score</h3>
-            </div>
-            <div className="flex items-end gap-3 mb-3">
-              <span className="text-5xl font-bold text-brand-600 dark:text-brand-400">{profile?.performanceScore ?? 0}</span>
-              <span className="text-lg text-gray-400 dark:text-gray-500 mb-1">/100</span>
-            </div>
-            <div className="w-full bg-white/60 dark:bg-gray-800/60 rounded-full h-2.5">
-              <div className={`h-2.5 rounded-full transition-all ${
-                (profile?.performanceScore ?? 0) >= 70 ? 'bg-green-500' :
-                (profile?.performanceScore ?? 0) >= 40 ? 'bg-brand-500' : 'bg-amber-500'
-              }`} style={{ width: `${profile?.performanceScore ?? 0}%` }} />
-            </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-              Based on average skill strength across {profile?.skills?.length ?? 0} detected skills
-            </p>
           </div>
 
           {/* Assigned projects */}
