@@ -6,15 +6,6 @@ SynapseForce is a full-stack HR management platform that uses skill-based AI mat
 
 ---
 
-## Live Demo
-
-| Service  | URL |
-|----------|-----|
-| Frontend | https://synapse-force.vercel.app |
-| Backend API | https://synapseforce-api.onrender.com |
-
----
-
 ## Features
 
 ### HR Admin
