@@ -56,9 +56,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Support multiple origins (comma-separated in env var)
+        // Support multiple origins (comma-separated in env var) + always allow localhost
         String origins = corsAllowedOrigins != null ? corsAllowedOrigins : "http://localhost:5173";
-        config.setAllowedOrigins(java.util.Arrays.asList(origins.split(",")));
+        List<String> originList = new java.util.ArrayList<>(
+            java.util.Arrays.asList(origins.split(","))
+        );
+        // Always allow localhost for local dev
+        if (!originList.contains("http://localhost:5173")) {
+            originList.add("http://localhost:5173");
+        }
+        config.setAllowedOriginPatterns(List.of("*")); // use pattern to support all Vercel preview URLs
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
