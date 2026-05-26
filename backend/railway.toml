@@ -1,0 +1,8 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "java -Dspring.profiles.active=prod -jar target/synapseforce-api-1.0.0.jar"
+healthcheckPath = "/auth/login"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"

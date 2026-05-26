@@ -168,118 +168,126 @@ function ChatWindow({ otherId, otherName, currentUserId, onNewMessage }) {
   )
 }
 
-// HR Inbox
+// HR Inbox — shows ALL employees, HR can initiate or reply
 function AdminMessages({ currentUserId }) {
-  const [conversations, setConversations] = useState([])
+  const [employees, setEmployees] = useState([])
+  const [conversations, setConversations] = useState({}) // userId -> unreadCount
   const [selected, setSelected] = useState(null)
-  const [loadingConvs, setLoadingConvs] = useState(true)
-  const [fetchError, setFetchError] = useState(null)
+  const [search, setSearch] = useState('')
+  const [loading, setLoading] = useState(true)
 
-  const loadConversations = () => {
-    api.get('/messages/conversations')
-      .then(res => {
-        setConversations(res.data || [])
-        setFetchError(null)
-        setLoadingConvs(false)
-      })
-      .catch(err => {
-        const status = err.response?.status
-        if (status === 401) {
-          setFetchError('Session expired — please log out and log back in.')
-        } else {
-          setFetchError(`Failed to load messages (${status || 'network error'})`)
-        }
-        setLoadingConvs(false)
-      })
+  // Load all employees + conversation unread counts
+  const loadData = () => {
+    Promise.all([
+      api.get('/users'),
+      api.get('/messages/conversations'),
+    ]).then(([usersRes, convsRes]) => {
+      // Filter out admins
+      const emps = usersRes.data.filter(u => u.role === 'USER')
+      setEmployees(emps)
+      // Build unread map
+      const unreadMap = {}
+      convsRes.data.forEach(c => { unreadMap[c.userId] = c.unreadCount })
+      setConversations(unreadMap)
+      setLoading(false)
+    }).catch(() => setLoading(false))
   }
 
   useEffect(() => {
-    loadConversations()
-    const interval = setInterval(loadConversations, 4000)
+    loadData()
+    const interval = setInterval(loadData, 5000)
     return () => clearInterval(interval)
   }, [])
 
-  // Auto-select first conversation
-  useEffect(() => {
-    if (conversations.length > 0 && !selected) {
-      setSelected(conversations[0])
-    }
-  }, [conversations])
+  const filtered = employees.filter(e =>
+    e.fullName?.toLowerCase().includes(search.toLowerCase()) ||
+    e.email?.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const AVAIL_COLOR = {
+    AVAILABLE: 'bg-green-500',
+    BUSY: 'bg-amber-500',
+    ON_LEAVE: 'bg-red-400',
+  }
 
   return (
     <div className="card p-0 overflow-hidden flex" style={{ height: 'calc(100vh - 11rem)' }}>
-      {/* Left sidebar — conversation list */}
+      {/* Left sidebar — ALL employees */}
       <div className="w-72 border-r border-gray-100 dark:border-gray-800 flex flex-col shrink-0">
-        <div className="px-4 py-3.5 border-b border-gray-100 dark:border-gray-800">
-          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Inbox</p>
-          <p className="text-xs text-gray-400 dark:text-gray-500">
-            {conversations.length} conversation{conversations.length !== 1 ? 's' : ''}
-          </p>
+        <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
+          <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Employees</p>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">Select to start or view conversation</p>
+        </div>
+
+        {/* Search */}
+        <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-800">
+          <input
+            type="text"
+            placeholder="Search employees..."
+            className="input text-xs py-1.5"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {loadingConvs ? (
+          {loading ? (
             <div className="flex justify-center py-8">
               <div className="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : fetchError ? (
-            <div className="px-4 py-6 text-center">
-              <p className="text-xs text-red-500 dark:text-red-400">{fetchError}</p>
-            </div>
-          ) : conversations.length === 0 ? (
-            <div className="px-4 py-8 text-center">
-              <MessageSquare size={24} className="text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-              <p className="text-xs text-gray-400 dark:text-gray-500">No messages yet</p>
-              <p className="text-[11px] text-gray-400 dark:text-gray-600 mt-1">Employees will appear here when they message you</p>
-            </div>
+          ) : filtered.length === 0 ? (
+            <p className="text-xs text-gray-400 dark:text-gray-500 text-center py-8">No employees found</p>
           ) : (
-            conversations.map(c => (
-              <button
-                key={c.userId}
-                onClick={() => setSelected(c)}
-                className={`w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-800/60 transition-colors text-left border-b border-gray-50 dark:border-gray-800/50 ${
-                  selected?.userId === c.userId
-                    ? 'bg-brand-50 dark:bg-brand-600/10 border-l-2 border-l-brand-500'
-                    : ''
-                }`}
-              >
-                <div className="relative shrink-0">
-                  <div className="w-9 h-9 rounded-full bg-brand-100 dark:bg-brand-600/20 flex items-center justify-center text-brand-600 dark:text-brand-400 text-sm font-semibold">
-                    {c.fullName.charAt(0)}
+            filtered.map(emp => {
+              const unread = conversations[emp.id] ?? 0
+              const isSelected = selected?.id === emp.id
+              return (
+                <button
+                  key={emp.id}
+                  onClick={() => setSelected(emp)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-left border-b border-gray-50 dark:border-gray-800/50 ${
+                    isSelected ? 'bg-brand-50 dark:bg-brand-600/10 border-l-2 border-l-brand-500' : ''
+                  }`}
+                >
+                  <div className="relative shrink-0">
+                    <div className="w-9 h-9 rounded-full bg-brand-100 dark:bg-brand-600/20 flex items-center justify-center text-brand-600 dark:text-brand-400 text-sm font-semibold">
+                      {emp.fullName?.charAt(0)}
+                    </div>
+                    <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-900 ${AVAIL_COLOR[emp.availability] ?? 'bg-green-500'}`} />
                   </div>
-                  {c.unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-red-500 text-white text-[9px] flex items-center justify-center font-bold">
-                      {c.unreadCount}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm truncate ${unread > 0 ? 'font-semibold text-gray-900 dark:text-gray-100' : 'font-medium text-gray-700 dark:text-gray-300'}`}>
+                      {emp.fullName}
+                    </p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{emp.email}</p>
+                  </div>
+                  {unread > 0 && (
+                    <span className="w-5 h-5 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold shrink-0">
+                      {unread}
                     </span>
                   )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm truncate ${c.unreadCount > 0 ? 'font-semibold text-gray-900 dark:text-gray-100' : 'font-medium text-gray-700 dark:text-gray-300'}`}>
-                    {c.fullName}
-                  </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{c.email}</p>
-                </div>
-              </button>
-            ))
+                </button>
+              )
+            })
           )}
         </div>
       </div>
 
-      {/* Right — chat window */}
+      {/* Right — chat */}
       <div className="flex-1 min-w-0">
         {selected ? (
           <ChatWindow
-            otherId={selected.userId}
+            otherId={selected.id}
             otherName={selected.fullName}
             currentUserId={currentUserId}
-            onNewMessage={loadConversations}
+            onNewMessage={loadData}
           />
         ) : (
           <div className="flex items-center justify-center h-full">
             <EmptyState
               icon={MessageSquare}
-              title="Select a conversation"
-              description="Choose an employee from the left to view and reply to their messages."
+              title="Select an employee"
+              description="Choose any employee from the left to start or continue a conversation."
             />
           </div>
         )}

@@ -1,18 +1,22 @@
 import axios from 'axios'
 
+// In production (Vercel), use the Railway backend URL directly
+// In development, use Vite proxy (/api -> localhost:8081)
+const baseURL = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL
+  : '/api'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL,
   headers: { 'Content-Type': 'application/json' },
 })
 
-// Attach JWT to every request
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('sf_token')
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
 
-// Redirect to login only on 401 (expired/invalid token)
 api.interceptors.response.use(
   (res) => res,
   (err) => {

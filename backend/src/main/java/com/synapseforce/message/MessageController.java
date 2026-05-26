@@ -1,5 +1,7 @@
 package com.synapseforce.message;
 
+import com.synapseforce.notification.Notification;
+import com.synapseforce.notification.NotificationRepository;
 import com.synapseforce.user.Role;
 import com.synapseforce.user.User;
 import com.synapseforce.user.UserRepository;
@@ -19,6 +21,7 @@ public class MessageController {
 
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final NotificationRepository notificationRepository;
 
     @PostMapping("/send/{receiverId}")
     public ResponseEntity<Map<String, Object>> send(
@@ -36,7 +39,18 @@ public class MessageController {
                 .content(body.get("content"))
                 .build();
 
-        return ResponseEntity.ok(toDto(messageRepository.save(msg)));
+        Message saved = messageRepository.save(msg);
+
+        // Create a notification for the receiver
+        String preview = saved.getContent().length() > 50
+                ? saved.getContent().substring(0, 50) + "..."
+                : saved.getContent();
+        notificationRepository.save(Notification.builder()
+                .userId(receiver.getId())
+                .message("New message from " + sender.getFullName() + ": \"" + preview + "\"")
+                .build());
+
+        return ResponseEntity.ok(toDto(saved));
     }
 
     @GetMapping("/conversation/{otherId}")

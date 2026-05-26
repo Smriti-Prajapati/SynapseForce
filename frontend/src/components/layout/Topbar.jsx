@@ -1,9 +1,42 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
-import { Bell, LogOut, Search, Sun, Moon, Check, X, Users, Briefcase, Brain } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Bell, LogOut, Search, Sun, Moon, Check, X, Users, Briefcase } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import { useNavigate } from 'react-router-dom'
 import api from '../../lib/api'
+
+// ─── Animated placeholder ─────────────────────────────────────────────────────
+const PLACEHOLDERS = [
+  'Search employees...',
+  'Search projects...',
+  'Search by skill...',
+  'Search by name...',
+]
+
+function AnimatedPlaceholder({ visible }) {
+  const [idx, setIdx] = useState(0)
+  const [fade, setFade] = useState(true)
+
+  useEffect(() => {
+    if (!visible) return
+    const interval = setInterval(() => {
+      setFade(false)
+      setTimeout(() => {
+        setIdx(i => (i + 1) % PLACEHOLDERS.length)
+        setFade(true)
+      }, 300)
+    }, 2500)
+    return () => clearInterval(interval)
+  }, [visible])
+
+  if (!visible) return null
+
+  return (
+    <span className={`pointer-events-none absolute left-8 top-1/2 -translate-y-1/2 text-sm text-gray-400 transition-opacity duration-300 select-none ${fade ? 'opacity-100' : 'opacity-0'}`}>
+      {PLACEHOLDERS[idx]}
+    </span>
+  )
+}
 
 // ─── Global Search ────────────────────────────────────────────────────────────
 function GlobalSearch() {
@@ -16,7 +49,6 @@ function GlobalSearch() {
   const { user } = useAuth()
   const isAdmin = user?.role === 'ADMIN'
 
-  // Debounced search
   useEffect(() => {
     if (!query.trim()) { setResults(null); setOpen(false); return }
     const timer = setTimeout(async () => {
@@ -27,23 +59,12 @@ function GlobalSearch() {
           isAdmin ? api.get('/users') : Promise.resolve({ data: [] }),
           api.get('/projects'),
         ])
-
         const matchedEmployees = usersRes.data
-          .filter(u =>
-            u.fullName?.toLowerCase().includes(q) ||
-            u.email?.toLowerCase().includes(q) ||
-            u.topSkills?.some(s => s.toLowerCase().includes(q))
-          )
+          .filter(u => u.fullName?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q) || u.topSkills?.some(s => s.toLowerCase().includes(q)))
           .slice(0, 4)
-
         const matchedProjects = projectsRes.data
-          .filter(p =>
-            p.name?.toLowerCase().includes(q) ||
-            p.description?.toLowerCase().includes(q) ||
-            p.requiredSkills?.toLowerCase().includes(q)
-          )
+          .filter(p => p.name?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q) || p.requiredSkills?.toLowerCase().includes(q))
           .slice(0, 4)
-
         setResults({ employees: matchedEmployees, projects: matchedProjects })
         setOpen(true)
       } catch {
@@ -55,31 +76,21 @@ function GlobalSearch() {
     return () => clearTimeout(timer)
   }, [query, isAdmin])
 
-  // Close on outside click
   useEffect(() => {
-    const handler = (e) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
-        setOpen(false)
-      }
-    }
+    const handler = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false) }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const handleSelect = (path) => {
-    setQuery('')
-    setOpen(false)
-    navigate(path)
-  }
-
+  const handleSelect = (path) => { setQuery(''); setOpen(false); navigate(path) }
   const total = (results?.employees?.length ?? 0) + (results?.projects?.length ?? 0)
 
   return (
     <div className="relative hidden md:block" ref={wrapRef}>
-      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+      <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none z-10" />
+      <AnimatedPlaceholder visible={!query} />
       <input
         type="text"
-        placeholder="Search employees, projects, skills..."
         value={query}
         onChange={e => setQuery(e.target.value)}
         onFocus={() => results && setOpen(true)}
@@ -92,7 +103,6 @@ function GlobalSearch() {
         </button>
       )}
 
-      {/* Results dropdown */}
       {open && (
         <div className="absolute top-10 left-0 w-80 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl z-[100] overflow-hidden">
           {loading ? (
@@ -107,7 +117,6 @@ function GlobalSearch() {
             </div>
           ) : (
             <div className="py-1">
-              {/* Employees */}
               {results.employees.length > 0 && (
                 <>
                   <div className="px-3 py-1.5 flex items-center gap-1.5">
@@ -120,7 +129,7 @@ function GlobalSearch() {
                       <div className="w-7 h-7 rounded-full bg-brand-100 dark:bg-brand-600/20 flex items-center justify-center text-brand-600 dark:text-brand-400 text-xs font-semibold shrink-0">
                         {e.fullName?.charAt(0)}
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{e.fullName}</p>
                         <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{e.email}</p>
                       </div>
@@ -134,7 +143,6 @@ function GlobalSearch() {
                 </>
               )}
 
-              {/* Projects */}
               {results.projects.length > 0 && (
                 <>
                   {results.employees.length > 0 && <div className="border-t border-gray-100 dark:border-gray-800 my-1" />}
@@ -244,14 +252,11 @@ function NotificationDropdown({ onClose }) {
           <div className="py-10 text-center">
             <Bell size={24} className="text-gray-300 dark:text-gray-600 mx-auto mb-2" />
             <p className="text-xs text-gray-400 dark:text-gray-500">No notifications yet</p>
-            <p className="text-[10px] text-gray-400 dark:text-gray-600 mt-1">You'll be notified when assigned to projects or tasks</p>
           </div>
         ) : (
           notifications.map(n => (
             <div key={n.id} onClick={e => { e.stopPropagation(); if (!n.read) markRead(n.id) }}
-              className={`px-4 py-3 border-b border-gray-50 dark:border-gray-800/60 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
-                !n.read ? 'bg-brand-50/60 dark:bg-brand-900/10' : ''
-              }`}>
+              className={`px-4 py-3 border-b border-gray-50 dark:border-gray-800/60 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${!n.read ? 'bg-brand-50/60 dark:bg-brand-900/10' : ''}`}>
               <div className="flex items-start gap-2.5">
                 {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-brand-500 mt-1.5 shrink-0" />}
                 <div className={!n.read ? '' : 'ml-4'}>
@@ -285,16 +290,12 @@ export default function Topbar({ title }) {
         .catch(() => {})
     }
     fetchCount()
-    const interval = setInterval(fetchCount, 15000)
+    const interval = setInterval(fetchCount, 5000)
     return () => clearInterval(interval)
   }, [])
 
   useEffect(() => {
-    const handler = (e) => {
-      if (bellRef.current && !bellRef.current.contains(e.target)) {
-        setShowNotifs(false)
-      }
-    }
+    const handler = (e) => { if (bellRef.current && !bellRef.current.contains(e.target)) setShowNotifs(false) }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
@@ -314,7 +315,6 @@ export default function Topbar({ title }) {
           {dark ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
-        {/* Bell */}
         <div className="relative" ref={bellRef}>
           <button type="button"
             onClick={e => { e.stopPropagation(); setShowNotifs(v => !v) }}
