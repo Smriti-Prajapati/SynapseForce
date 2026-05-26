@@ -11,6 +11,7 @@ const pageTitles = {
   '/analytics': 'Analytics',
   '/messages': 'Messages',
   '/profile': 'My Profile',
+  '/hr-profile': 'My Profile',
 }
 
 export default function AppLayout() {

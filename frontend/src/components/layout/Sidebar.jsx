@@ -11,6 +11,7 @@ const adminNav = [
   { to: '/team', label: 'Team Builder', icon: Search },
   { to: '/messages', label: 'Messages', icon: MessageSquare },
   { to: '/analytics', label: 'Analytics', icon: BarChart2 },
+  { to: '/hr-profile', label: 'My Profile', icon: UserCircle },
 ]
 
 const userNav = [
