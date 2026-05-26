@@ -1,60 +1,66 @@
 /**
- * SynapseForce brand logo — used in Sidebar, Login, Register.
- * size="sm"  → sidebar (compact)
- * size="md"  → auth pages (centered)
+ * SynapseForce — brand logo
+ * size="sm"  → sidebar
+ * size="md"  → auth pages (larger, centered)
  */
 export default function Logo({ size = 'md' }) {
-  const isSmall = size === 'sm'
+  const sm = size === 'sm'
 
   return (
-    <div className={`flex items-center gap-${isSmall ? '2.5' : '3'}`}>
-      {/* Icon mark */}
-      <div className={`relative shrink-0 ${isSmall ? 'w-8 h-8' : 'w-10 h-10'}`}>
-        {/* Outer glow ring */}
-        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 opacity-20 blur-sm scale-110" />
-        {/* Main icon container */}
-        <div className="relative w-full h-full rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg">
-          {/* SF monogram as SVG — clean, startup-style */}
-          <svg
-            viewBox="0 0 24 24"
+    <div className={`flex items-center ${sm ? 'gap-2.5' : 'gap-3'}`}>
+      {/* ── Icon mark ── */}
+      <div className={`relative shrink-0 ${sm ? 'w-8 h-8' : 'w-10 h-10'}`}>
+        <svg
+          viewBox="0 0 40 40"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-full h-full"
+        >
+          {/* Rounded square background */}
+          <rect width="40" height="40" rx="10" fill="url(#logoGrad)" />
+
+          {/* ── S-shaped lightning bolt / synapse path ── */}
+          {/* Top-right arc → center → bottom-left arc — reads as "S" + energy */}
+          <path
+            d="M26 10 L16 10 C13.8 10 12 11.8 12 14 C12 16.2 13.8 18 16 18 L24 18 C26.2 18 28 19.8 28 22 C28 24.2 26.2 26 24 26 L14 26"
+            stroke="white"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             fill="none"
-            className={isSmall ? 'w-4 h-4' : 'w-5 h-5'}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            {/* Neural network / synapse nodes */}
-            <circle cx="12" cy="5" r="2" fill="white" fillOpacity="0.95" />
-            <circle cx="5" cy="14" r="1.5" fill="white" fillOpacity="0.7" />
-            <circle cx="19" cy="14" r="1.5" fill="white" fillOpacity="0.7" />
-            <circle cx="8.5" cy="20" r="1.5" fill="white" fillOpacity="0.6" />
-            <circle cx="15.5" cy="20" r="1.5" fill="white" fillOpacity="0.6" />
-            {/* Connecting lines */}
-            <line x1="12" y1="7" x2="5" y2="12.5" stroke="white" strokeWidth="1.2" strokeOpacity="0.6" strokeLinecap="round" />
-            <line x1="12" y1="7" x2="19" y2="12.5" stroke="white" strokeWidth="1.2" strokeOpacity="0.6" strokeLinecap="round" />
-            <line x1="5" y1="15.5" x2="8.5" y2="18.5" stroke="white" strokeWidth="1.2" strokeOpacity="0.5" strokeLinecap="round" />
-            <line x1="19" y1="15.5" x2="15.5" y2="18.5" stroke="white" strokeWidth="1.2" strokeOpacity="0.5" strokeLinecap="round" />
-            <line x1="6.5" y1="14" x2="17.5" y2="14" stroke="white" strokeWidth="1" strokeOpacity="0.35" strokeLinecap="round" />
-            {/* Center pulse dot */}
-            <circle cx="12" cy="14" r="1" fill="white" fillOpacity="0.9" />
-            <line x1="12" y1="7" x2="12" y2="13" stroke="white" strokeWidth="1.2" strokeOpacity="0.7" strokeLinecap="round" />
-          </svg>
-        </div>
+            opacity="0.95"
+          />
+          {/* Accent dot — bottom terminal */}
+          <circle cx="14" cy="30" r="2.5" fill="white" opacity="0.9" />
+          {/* Accent dot — top terminal */}
+          <circle cx="26" cy="10" r="0" fill="white" opacity="0" />
+
+          {/* Gradient definition */}
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stopColor="#6366f1" />
+              <stop offset="100%" stopColor="#4338ca" />
+            </linearGradient>
+          </defs>
+        </svg>
       </div>
 
-      {/* Wordmark */}
-      <div className="flex flex-col leading-none">
-        <span className={`font-bold tracking-tight text-gray-900 dark:text-white ${isSmall ? 'text-sm' : 'text-lg'}`}>
-          Synapse<span className="text-brand-500">Force</span>
+      {/* ── Wordmark ── */}
+      <div className="flex flex-col leading-none select-none">
+        <span
+          className={`font-bold tracking-tight text-gray-900 dark:text-white ${sm ? 'text-[13px]' : 'text-[18px]'}`}
+          style={{ letterSpacing: '-0.02em' }}
+        >
+          Synapse<span
+            className="text-transparent bg-clip-text"
+            style={{ backgroundImage: 'linear-gradient(135deg, #6366f1, #4338ca)' }}
+          >Force</span>
         </span>
-        {!isSmall && (
-          <span className="text-[10px] text-gray-400 dark:text-gray-500 tracking-widest uppercase mt-0.5">
-            Workforce Intelligence
-          </span>
-        )}
-        {isSmall && (
-          <span className="text-[9px] text-gray-400 dark:text-gray-500 tracking-widest uppercase mt-0.5">
-            Workforce AI
-          </span>
-        )}
+        <span
+          className={`text-gray-400 dark:text-gray-500 uppercase tracking-widest font-medium ${sm ? 'text-[8px] mt-0.5' : 'text-[9px] mt-1'}`}
+        >
+          Workforce Intelligence
+        </span>
       </div>
     </div>
   )
