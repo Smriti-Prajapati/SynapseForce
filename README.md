@@ -13,15 +13,6 @@ SynapseForce is a full-stack HR management platform that uses skill-based AI mat
 | Frontend | https://synapse-force.vercel.app |
 | Backend API | https://synapseforce-api.onrender.com |
 
-**Demo credentials**
-
-| Role | Email | Password |
-|------|-------|----------|
-| HR Admin | smriti@gmail.com | smriti123 |
-| Employee | alice@synapseforce.com | pass123 |
-| Employee | bob@synapseforce.com | pass123 |
-| Employee | carol@synapseforce.com | pass123 |
-
 ---
 
 ## Features
