@@ -23,6 +23,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Map<String, Object>>> listAll() {
         List<Map<String, Object>> users = userRepository.findAll().stream()
+                .filter(u -> u.getRole() == Role.USER) // exclude admins from employee list
                 .map(u -> {
                     var skills = skillRepository.findByUserId(u.getId());
                     double avg = skills.isEmpty() ? 0 :
