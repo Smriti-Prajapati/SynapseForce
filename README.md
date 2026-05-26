@@ -61,8 +61,8 @@ SynapseForce is a full-stack HR management platform that uses skill-based AI mat
 | JJWT | 0.11.5 | JWT token generation and validation |
 | Spring Data JPA / Hibernate | 6.x | ORM and database access |
 | Apache Tika | 2.9.1 | Resume text extraction (PDF, DOCX) |
-| PostgreSQL | 15+ | Production database |
-| H2 | — | In-memory database for local development |
+| PostgreSQL | 15+ | Production database (Supabase) |
+| H2 | — | In-memory database for local development only |
 | Lombok | — | Boilerplate reduction |
 
 ### Frontend
@@ -81,7 +81,7 @@ SynapseForce is a full-stack HR management platform that uses skill-based AI mat
 |---------|---------|
 | Render | Backend hosting (Docker) |
 | Vercel | Frontend hosting |
-| Supabase | Managed PostgreSQL database |
+| Supabase | Managed PostgreSQL database (production) |
 | GitHub | Source control and CI/CD trigger |
 
 ---
@@ -136,7 +136,7 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
-The API starts on `http://localhost:8081`. H2 in-memory database is used automatically — no setup needed. Demo data (users, skills, projects) is seeded on first run.
+The API starts on `http://localhost:8081`. H2 in-memory database is used automatically for local development — no setup needed. In production, the app connects to Supabase PostgreSQL via the `DATABASE_URL` environment variable. Demo data (users, skills, projects) is seeded on first run.
 
 H2 console: `http://localhost:8081/h2-console`
 - JDBC URL: `jdbc:h2:mem:synapseforce`
