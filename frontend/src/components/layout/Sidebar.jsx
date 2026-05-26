@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, FileText, Users, BarChart2, Zap, Briefcase, UserCircle, Search, MessageSquare } from 'lucide-react'
+import { LayoutDashboard, FileText, Users, BarChart2, Briefcase, UserCircle, Search, MessageSquare } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import clsx from 'clsx'
+import Logo from '../ui/Logo'
 
 const adminNav = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -27,14 +28,8 @@ export default function Sidebar() {
   return (
     <aside className="w-60 min-h-screen bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col transition-colors">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center">
-            <Zap size={16} className="text-white" />
-          </div>
-          <span className="font-semibold text-gray-900 dark:text-gray-100 text-sm">SynapseForce</span>
-        </div>
-        <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 ml-10">Workforce Intelligence</p>
+      <div className="px-4 py-5 border-b border-gray-100 dark:border-gray-800">
+        <Logo size="sm" />
       </div>
 
       {/* Role label */}

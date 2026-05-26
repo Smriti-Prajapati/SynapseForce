@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
-import { Zap, Sun, Moon } from 'lucide-react'
+import { Sun, Moon } from 'lucide-react'
+import Logo from '../components/ui/Logo'
 
 export default function Register() {
   const { register } = useAuth()
@@ -42,11 +43,8 @@ export default function Register() {
       </button>
 
       <div className="w-full max-w-sm">
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center">
-            <Zap size={18} className="text-white" />
-          </div>
-          <span className="text-xl font-semibold text-gray-900 dark:text-gray-100">SynapseForce</span>
+        <div className="flex items-center justify-center mb-8">
+          <Logo size="md" />
         </div>
 
         <div className="card">
