@@ -129,6 +129,7 @@ function UserDashboard({ user }) {
   const [projects, setProjects] = useState([])
 
   useEffect(() => {
+    // Always fetch fresh — skills may have changed after resume upload
     api.get('/users/me').then(res => setProfile(res.data)).catch(() => {})
     api.get(`/projects/my/${user.userId}`).then(res => setProjects(res.data)).catch(() => {})
   }, [user.userId])
@@ -145,8 +146,8 @@ function UserDashboard({ user }) {
         <div className="card">
           <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">My Skills</h3>
           {profile?.skills?.length > 0 ? (
-            <div className="space-y-2">
-              {profile.skills.sort((a, b) => b.strengthLevel - a.strengthLevel).slice(0, 6).map(s => (
+            <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+              {profile.skills.sort((a, b) => b.strengthLevel - a.strengthLevel).map(s => (
                 <div key={s.id} className="flex items-center gap-3">
                   <span className="text-sm text-gray-700 dark:text-gray-300 w-32 truncate">{s.skillName}</span>
                   <div className="flex-1 bg-gray-100 dark:bg-gray-800 rounded-full h-1.5">
