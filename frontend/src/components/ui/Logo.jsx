@@ -1,4 +1,4 @@
-import logoImg from '../../assets/logo.jpeg'
+import logoImg from '../../assets/logo.png'
 
 /**
  * SynapseForce brand logo — uses the official SF logo image
