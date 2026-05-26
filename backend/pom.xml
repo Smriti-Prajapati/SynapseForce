@@ -100,6 +100,7 @@
     </dependencies>
 
     <build>
+        <finalName>synapseforce-api</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
