@@ -1,69 +1,66 @@
 /**
- * SynapseForce brand logo
- * Recreates the SF monogram with circuit dots + blue gradient
- * size="sm"  → sidebar (icon + compact wordmark)
- * size="md"  → auth pages (icon + full wordmark + tagline)
- * size="icon" → icon only
+ * SynapseForce brand logo — SF monogram matching the provided image
+ * The S is a stylized shape with two horizontal bars + curve
+ * The F shares the vertical bar with horizontal bars
+ * Circuit dots on the left side of the S
+ * Blue gradient throughout, "Force" in blue, tagline below
  */
 export default function Logo({ size = 'md' }) {
   const sm = size === 'sm'
-  const iconOnly = size === 'icon'
+
+  const iconW = sm ? 44 : 64
+  const iconH = sm ? 36 : 52
 
   const icon = (
     <svg
-      viewBox="0 0 80 80"
+      viewBox="0 0 110 90"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={sm ? 'w-9 h-9' : 'w-14 h-14'}
+      style={{ width: iconW, height: iconH }}
     >
       <defs>
-        <linearGradient id="sfGrad" x1="10" y1="10" x2="70" y2="70" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#38bdf8" />
+        <linearGradient id="sfG1" x1="5" y1="10" x2="75" y2="80" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#60a5fa" />
           <stop offset="50%" stopColor="#3b82f6" />
-          <stop offset="100%" stopColor="#1d4ed8" />
+          <stop offset="100%" stopColor="#1e40af" />
         </linearGradient>
-        <linearGradient id="sfGrad2" x1="40" y1="10" x2="70" y2="70" gradientUnits="userSpaceOnUse">
+        <linearGradient id="sfG2" x1="50" y1="10" x2="100" y2="80" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#38bdf8" />
           <stop offset="100%" stopColor="#2563eb" />
         </linearGradient>
       </defs>
 
-      {/* ── S shape ── */}
-      {/* Top bar of S */}
-      <path
-        d="M18 18 L38 18 C44 18 48 22 48 27 C48 32 44 36 38 36 L22 36 C16 36 12 40 12 45 C12 50 16 54 22 54 L42 54"
-        stroke="url(#sfGrad)"
-        strokeWidth="7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="none"
-      />
+      {/* ── S shape (left) ── */}
+      {/* Top horizontal bar of S */}
+      <line x1="18" y1="18" x2="46" y2="18" stroke="url(#sfG1)" strokeWidth="8" strokeLinecap="round" />
+      {/* Top-right curve going down */}
+      <path d="M46 18 Q52 18 52 26 Q52 34 46 34" stroke="url(#sfG1)" strokeWidth="8" strokeLinecap="round" fill="none" />
+      {/* Middle horizontal bar of S */}
+      <line x1="18" y1="34" x2="46" y2="34" stroke="url(#sfG1)" strokeWidth="8" strokeLinecap="round" />
+      {/* Bottom-left curve going down */}
+      <path d="M18 34 Q12 34 12 42 Q12 50 18 50" stroke="url(#sfG1)" strokeWidth="8" strokeLinecap="round" fill="none" />
+      {/* Bottom horizontal bar of S */}
+      <line x1="18" y1="50" x2="46" y2="50" stroke="url(#sfG1)" strokeWidth="8" strokeLinecap="round" />
 
-      {/* ── F shape (right side, overlapping) ── */}
+      {/* ── F shape (right, shares space) ── */}
       {/* Vertical bar */}
-      <line x1="52" y1="18" x2="52" y2="62" stroke="url(#sfGrad2)" strokeWidth="7" strokeLinecap="round" />
+      <line x1="62" y1="18" x2="62" y2="68" stroke="url(#sfG2)" strokeWidth="8" strokeLinecap="round" />
       {/* Top horizontal */}
-      <line x1="52" y1="18" x2="70" y2="18" stroke="url(#sfGrad2)" strokeWidth="7" strokeLinecap="round" />
-      {/* Middle horizontal */}
-      <line x1="52" y1="40" x2="66" y2="40" stroke="url(#sfGrad2)" strokeWidth="7" strokeLinecap="round" />
+      <line x1="62" y1="18" x2="90" y2="18" stroke="url(#sfG2)" strokeWidth="8" strokeLinecap="round" />
+      {/* Middle horizontal (shorter) */}
+      <line x1="62" y1="43" x2="84" y2="43" stroke="url(#sfG2)" strokeWidth="8" strokeLinecap="round" />
 
-      {/* ── Circuit dots with lines ── */}
-      {/* Top-right circuit */}
-      <line x1="70" y1="18" x2="76" y2="12" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
-      <circle cx="76" cy="10" r="2.5" fill="none" stroke="#38bdf8" strokeWidth="1.5" opacity="0.9" />
-      <circle cx="76" cy="10" r="1" fill="#38bdf8" opacity="0.9" />
+      {/* ── Circuit dot — top right of F ── */}
+      <line x1="90" y1="18" x2="98" y2="10" stroke="#38bdf8" strokeWidth="1.8" strokeLinecap="round" opacity="0.85" />
+      <circle cx="100" cy="8" r="3" fill="none" stroke="#38bdf8" strokeWidth="1.8" opacity="0.85" />
+      <circle cx="100" cy="8" r="1.2" fill="#38bdf8" opacity="0.85" />
 
-      {/* Left-middle circuit */}
-      <line x1="12" y1="45" x2="6" y2="45" stroke="#38bdf8" strokeWidth="1.5" strokeLinecap="round" opacity="0.9" />
-      <circle cx="4" cy="45" r="2.5" fill="none" stroke="#38bdf8" strokeWidth="1.5" opacity="0.9" />
-      <circle cx="4" cy="45" r="1" fill="#38bdf8" opacity="0.9" />
-
-      {/* Small tick/arrow on F bottom — matches the pic's angular cut */}
-      <path d="M52 62 L46 68" stroke="url(#sfGrad2)" strokeWidth="5" strokeLinecap="round" />
+      {/* ── Circuit dot — left of S middle ── */}
+      <line x1="12" y1="34" x2="4" y2="34" stroke="#38bdf8" strokeWidth="1.8" strokeLinecap="round" opacity="0.85" />
+      <circle cx="2" cy="34" r="3" fill="none" stroke="#38bdf8" strokeWidth="1.8" opacity="0.85" />
+      <circle cx="2" cy="34" r="1.2" fill="#38bdf8" opacity="0.85" />
     </svg>
   )
-
-  if (iconOnly) return icon
 
   return (
     <div className={`flex items-center ${sm ? 'gap-2' : 'gap-3'}`}>
@@ -71,30 +68,24 @@ export default function Logo({ size = 'md' }) {
 
       {/* Wordmark */}
       <div className="flex flex-col leading-none select-none">
-        <div className={`font-bold tracking-tight ${sm ? 'text-sm' : 'text-2xl'}`} style={{ letterSpacing: '-0.02em' }}>
-          <span className="text-white dark:text-white" style={{ color: 'inherit' }}>
-            <span className="text-gray-900 dark:text-white">Synapse</span>
-            <span style={{ background: 'linear-gradient(135deg, #38bdf8, #2563eb)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              Force
-            </span>
-          </span>
+        <div
+          className={`font-bold ${sm ? 'text-sm' : 'text-[22px]'}`}
+          style={{ letterSpacing: '-0.01em', lineHeight: 1 }}
+        >
+          <span className="text-gray-900 dark:text-white">Synapse</span>
+          <span style={{
+            background: 'linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+          }}>Force</span>
         </div>
-        {!sm && (
-          <span
-            className="text-gray-400 dark:text-gray-500 font-medium tracking-widest uppercase mt-1"
-            style={{ fontSize: '9px', letterSpacing: '0.2em' }}
-          >
-            Intelligence in Motion
-          </span>
-        )}
-        {sm && (
-          <span
-            className="text-gray-400 dark:text-gray-500 font-medium tracking-widest uppercase mt-0.5"
-            style={{ fontSize: '7px', letterSpacing: '0.15em' }}
-          >
-            Intelligence in Motion
-          </span>
-        )}
+        <span
+          className="text-gray-400 dark:text-gray-500 font-semibold tracking-widest uppercase"
+          style={{ fontSize: sm ? '6.5px' : '8.5px', letterSpacing: '0.22em', marginTop: sm ? '3px' : '5px' }}
+        >
+          Intelligence in Motion
+        </span>
       </div>
     </div>
   )
