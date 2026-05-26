@@ -239,10 +239,12 @@ The same scoring logic powers the **Team Builder** page, where HR can enter any 
 ---
 
 ## Screenshots
+<img width="1919" height="1013" alt="image" src="https://github.com/user-attachments/assets/3ad1b67b-5403-43af-923f-86cc2657a31b" />
 
-> Dashboard (HR Admin) · Employee Directory · Project Tracking · Messaging · Analytics
+> Dashboard (HR Admin)
+>  · Employee Directory · Project Tracking · Messaging · Analytics
 
-*(Add screenshots here)*
+
 
 ---
 
