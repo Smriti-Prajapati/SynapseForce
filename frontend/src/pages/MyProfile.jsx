@@ -1,8 +1,58 @@
 import { useEffect, useState, useRef } from 'react'
-import { Briefcase, Star, Upload, FileText, CheckCircle, Brain } from 'lucide-react'
+import { Briefcase, Star, Upload, FileText, CheckCircle, Brain, ChevronDown } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import api from '../lib/api'
 import EmptyState from '../components/ui/EmptyState'
+
+const AVAIL_OPTIONS = [
+  { value: 'AVAILABLE', label: 'Available', dot: 'bg-green-500', text: 'text-green-600 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' },
+  { value: 'BUSY',      label: 'Busy',      dot: 'bg-amber-500', text: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800' },
+  { value: 'ON_LEAVE',  label: 'On Leave',  dot: 'bg-red-500',   text: 'text-red-600 dark:text-red-400',     bg: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800' },
+]
+
+function AvailabilityPicker({ value, onChange }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef()
+  const current = AVAIL_OPTIONS.find(o => o.value === value) ?? AVAIL_OPTIONS[0]
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className={`flex items-center gap-2 text-xs px-2.5 py-1 rounded-lg border font-medium transition-colors ${current.bg} ${current.text}`}
+      >
+        <span className={`w-2 h-2 rounded-full shrink-0 ${current.dot}`} />
+        {current.label}
+        <ChevronDown size={11} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && (
+        <div className="absolute left-0 top-8 w-36 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 overflow-hidden py-1">
+          {AVAIL_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => { onChange(opt.value); setOpen(false) }}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                opt.value === value ? `${opt.text}` : 'text-gray-700 dark:text-gray-300'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full shrink-0 ${opt.dot}`} />
+              {opt.label}
+              {opt.value === value && <span className="ml-auto text-[10px] opacity-60">current</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 function ProgressUpdateModal({ project, onClose, onUpdated }) {
   const [percent, setPercent] = useState(project.progressPercent ?? 0)
@@ -152,11 +202,9 @@ export default function MyProfile() {
             <p className="text-sm text-gray-500 dark:text-gray-400">{profile?.email}</p>
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <span className="badge bg-brand-50 dark:bg-brand-600/10 text-brand-600 dark:text-brand-400">Employee</span>
-              <select
-                className="text-xs border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer"
+              <AvailabilityPicker
                 value={profile?.availability ?? 'AVAILABLE'}
-                onChange={async (e) => {
-                  const newStatus = e.target.value
+                onChange={async (newStatus) => {
                   setProfile(p => ({ ...p, availability: newStatus }))
                   try {
                     await api.patch(`/users/${profile.id}/availability?status=${newStatus}`)
@@ -164,11 +212,7 @@ export default function MyProfile() {
                     setProfile(p => ({ ...p, availability: profile.availability }))
                   }
                 }}
-              >
-                <option value="AVAILABLE">Available</option>
-                <option value="BUSY">Busy</option>
-                <option value="ON_LEAVE">On Leave</option>
-              </select>
+              />
             </div>
           </div>
 
