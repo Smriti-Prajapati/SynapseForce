@@ -249,4 +249,3 @@ The same scoring logic powers the **Team Builder** page, where HR can enter any 
 ## Author
 
 **Smriti Prajapati**  
-[GitHub](https://github.com/Smriti-Prajapati)
