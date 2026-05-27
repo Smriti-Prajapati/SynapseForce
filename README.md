@@ -242,7 +242,8 @@ The same scoring logic powers the **Team Builder** page, where HR can enter any 
 <img width="1919" height="997" alt="image" src="https://github.com/user-attachments/assets/00c32c41-a30f-415c-a572-0a8291ec2b42" />
 
 
-<img width="1919" height="1005" alt="image" src="https://github.com/user-attachments/assets/3e381ee5-eb47-46cf-a727-2c8d7fda8dfa" />
+<img width="1919" height="1004" alt="image" src="https://github.com/user-attachments/assets/306adf09-ea8f-413e-bc04-3c7aaa32215a" />
+
 
 
 
