@@ -18,6 +18,7 @@ const adminNav = [
 const userNav = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/profile', label: 'My Profile', icon: UserCircle },
+  { to: '/my-projects', label: 'My Projects', icon: Briefcase },
   { to: '/messages', label: 'Message HR', icon: MessageSquare },
 ]
 

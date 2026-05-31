@@ -362,7 +362,7 @@ export default function MyProfile() {
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{p.name}</p>
                         {p.description && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">{p.description}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{p.description}</p>
                         )}
                       </div>
                       <span className={`badge shrink-0 ${
@@ -373,6 +373,29 @@ export default function MyProfile() {
                         {p.status.replace('_', ' ')}
                       </span>
                     </div>
+
+                    {/* Required skills */}
+                    {p.requiredSkills && (
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {p.requiredSkills.split(',').map(s => (
+                          <span key={s} className="badge bg-brand-50 dark:bg-brand-600/10 text-brand-600 dark:text-brand-400 text-[10px]">
+                            {s.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Deadline */}
+                    {p.deadline && (
+                      <p className={`text-xs mb-3 flex items-center gap-1 ${
+                        p.overdue ? 'text-red-500 dark:text-red-400' : 'text-gray-500 dark:text-gray-400'
+                      }`}>
+                        {p.overdue ? '⚠ Overdue · ' : 'Due '}
+                        {new Date(p.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    )}
+
+                    {/* Progress */}
                     <div className="mb-3">
                       <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
                         <span>Progress</span>
@@ -385,9 +408,28 @@ export default function MyProfile() {
                         }`} style={{ width: `${p.progressPercent}%` }} />
                       </div>
                     </div>
+
                     {p.progressNote && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 italic mb-3">"{p.progressNote}"</p>
                     )}
+
+                    {/* Team members */}
+                    {p.teamMembers?.length > 0 && (
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mb-1.5">Team</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {p.teamMembers.map(m => (
+                            <span key={m.id} className="flex items-center gap-1 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-full px-2 py-0.5 text-xs text-gray-700 dark:text-gray-300">
+                              <span className="w-4 h-4 rounded-full bg-brand-100 dark:bg-brand-600/20 flex items-center justify-center text-brand-600 dark:text-brand-400 text-[9px] font-semibold">
+                                {m.fullName?.charAt(0)}
+                              </span>
+                              {m.fullName}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     {p.status !== 'COMPLETED' ? (
                       <button onClick={() => setActiveProject(p)} className="btn-secondary text-xs py-1.5 px-3">
                         Update Progress
