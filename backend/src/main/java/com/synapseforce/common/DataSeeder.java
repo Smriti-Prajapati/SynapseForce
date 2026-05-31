@@ -20,19 +20,20 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Only seed in local/dev — skip if any users already exist (production has real data)
-        if (userRepository.count() > 0) return;
+        try {
+            if (userRepository.count() > 0) return;
 
-        // In production with a fresh Supabase DB, seed only the admin account.
-        // All other data (employees, projects, skills) should be created through the app.
-        userRepository.save(User.builder()
-                .fullName("Smriti Prajapati")
-                .email("smriti@gmail.com")
-                .password(passwordEncoder.encode("smriti123"))
-                .role(Role.ADMIN)
-                .availability(AvailabilityStatus.AVAILABLE)
-                .build());
+            userRepository.save(User.builder()
+                    .fullName("Smriti Prajapati")
+                    .email("smriti@gmail.com")
+                    .password(passwordEncoder.encode("smriti123"))
+                    .role(Role.ADMIN)
+                    .availability(AvailabilityStatus.AVAILABLE)
+                    .build());
 
-        log.info("✅ Admin account created. Login: smriti@gmail.com / smriti123");
+            log.info("✅ Admin account created. Login: smriti@gmail.com / smriti123");
+        } catch (Exception e) {
+            log.error("⚠️ DataSeeder failed (non-fatal): {}", e.getMessage());
+        }
     }
 }
