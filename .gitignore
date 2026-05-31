@@ -22,4 +22,4 @@ Thumbs.db
 
 # Env / secrets
 *.env
-application-prod.properties
+# application-prod.properties is intentionally tracked — it uses env var placeholders, no secrets
