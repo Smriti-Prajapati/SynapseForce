@@ -28,7 +28,8 @@ public class AnalyticsController {
     @GetMapping("/overview")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, Object>> overview() {
-        long totalEmployees = userRepository.count();
+        long totalEmployees = userRepository.findAll().stream()
+                .filter(u -> u.getRole() == com.synapseforce.user.Role.USER).count();
         long totalSkills = skillRepository.count();
         long totalResumes = resumeRepository.count();
         long totalProjects = projectRepository.count();
