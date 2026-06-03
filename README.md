@@ -4,7 +4,6 @@
 
 SynapseForce is a full-stack HR management platform that uses skill-based AI matching to automatically assign the right employees to the right projects. HR admins get a complete workforce overview — from resume parsing and skill detection to project tracking, team suggestions, and real-time messaging. Employees get a personal workspace to manage their profile, track assigned projects, and communicate with HR.
 
-
 ---
 
 ## Features
