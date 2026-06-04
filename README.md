@@ -126,7 +126,7 @@ H2 console: `http://localhost:8081/h2-console`
 
 ### Frontend
 
-```bash
+```bash 
 cd frontend
 npm install
 npm run dev
