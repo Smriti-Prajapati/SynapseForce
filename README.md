@@ -30,7 +30,6 @@ SynapseForce is a full-stack HR management platform that uses skill-based AI mat
 - Fully responsive layout
 
 ---
-
 ## Tech Stack
 
 ### Backend
