@@ -248,6 +248,6 @@ The same scoring logic powers the **Team Builder** page, where HR can enter any 
 
 ---
 
-## Author
+## Developed by
 
 **Smriti Prajapati**  
